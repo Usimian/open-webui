@@ -1,33 +1,14 @@
+.PHONY: up down restart logs
 
-ifneq ($(shell which docker-compose 2>/dev/null),)
-    DOCKER_COMPOSE := docker-compose
-else
-    DOCKER_COMPOSE := docker compose
-endif
+up:
+	docker compose up -d
+	@echo "\nOpen WebUI is available at: http://localhost:8080"
 
-install:
-	$(DOCKER_COMPOSE) up -d
+down:
+	docker compose down
 
-remove:
-	@chmod +x confirm_remove.sh
-	@./confirm_remove.sh
+restart:
+	docker compose restart
 
-start:
-	$(DOCKER_COMPOSE) start
-startAndBuild: 
-	$(DOCKER_COMPOSE) up -d --build
-
-stop:
-	$(DOCKER_COMPOSE) stop
-
-update:
-	# Calls the LLM update script
-	chmod +x update_ollama_models.sh
-	@./update_ollama_models.sh
-	@git pull
-	$(DOCKER_COMPOSE) down
-	# Make sure the ollama-webui container is stopped before rebuilding
-	@docker stop open-webui || true
-	$(DOCKER_COMPOSE) up --build -d
-	$(DOCKER_COMPOSE) start
-
+logs:
+	docker compose logs -f open-webui
